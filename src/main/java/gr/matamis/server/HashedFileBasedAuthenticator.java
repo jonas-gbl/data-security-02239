@@ -1,16 +1,29 @@
 package gr.matamis.server;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class HashedFileBasedAuthenticator extends FileBasedAuthenticator {
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
+public class HashedFileBasedAuthenticator implements AuthenticationService {
+
+    private final Map<String, Pair<String, String>> passwords;
 
     public HashedFileBasedAuthenticator(Path passwordFile) throws IOException {
-        super(passwordFile);
+        List<String> userEntries = Files.readAllLines(passwordFile);
+        passwords = new HashMap<>();
+        for (String userEntry : userEntries) {
+            String[] entryParts = userEntry.split(":");
+            passwords.put(entryParts[0], new ImmutablePair<>(entryParts[1], entryParts[2]));
+        }
     }
 
     @Override
@@ -21,11 +34,11 @@ public class HashedFileBasedAuthenticator extends FileBasedAuthenticator {
 
         boolean isAuthenticated = false;
         if (passwords.containsKey(usenameToAuthenticate)) {
-            String storedSaltAndBase64HashedPassword = passwords.get(usenameToAuthenticate);
-            String[] saltAndPassword = storedSaltAndBase64HashedPassword.split("\\$");
+            Pair<String, String> storedSaltAndBase64HashedPassword = passwords.get(usenameToAuthenticate);
 
-            String salt = saltAndPassword[0];
-            String storedBase64HashedPassword = saltAndPassword[1];
+
+            String salt = storedSaltAndBase64HashedPassword.getLeft();
+            String storedBase64HashedPassword = storedSaltAndBase64HashedPassword.getRight();
 
             Base64.Decoder base64Decoder = Base64.getDecoder();
             byte[] saltBytes = base64Decoder.decode(salt);
