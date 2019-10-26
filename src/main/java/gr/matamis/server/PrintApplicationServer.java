@@ -9,12 +9,12 @@ import java.rmi.registry.Registry;
 
 public class PrintApplicationServer {
 
-    private static final String PASSWORD_FILE = "password.data";
+    private static final String HASHED_PASSWORD_FILE = "shadow.data";
 
     public static void main(String[] args) {
         try {
-            Path passwordFile = Paths.get(PASSWORD_FILE);
-            AuthenticationService authenticationService = new FileBasedAuthenticator(passwordFile);
+            Path passwordFile = Paths.get(HASHED_PASSWORD_FILE);
+            AuthenticationService authenticationService = new HashedFileBasedAuthenticator(passwordFile);
             Remote printServer = new RmiPrintServer(authenticationService);
 
             Registry registry = LocateRegistry.createRegistry(5050);

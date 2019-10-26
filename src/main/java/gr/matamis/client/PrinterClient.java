@@ -27,7 +27,7 @@ public class PrinterClient {
             Remote remoteComponent = Naming.lookup("rmi://localhost:5050/printer");
 
             PrintServer printServer = (PrintServer) remoteComponent;
-            Credentials panosCredentials = new Credentials("panos", "youpi");
+            Credentials panosCredentials = new Credentials("panos", "12345678");
             Credentials jonasCredentials = new Credentials("jonas", "123345");
 
             List<Credentials> credentialsList = new ArrayList<>();
