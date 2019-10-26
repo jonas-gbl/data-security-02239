@@ -27,7 +27,7 @@ public class PrinterClient {
             Remote remoteComponent = Naming.lookup("rmi://localhost:5050/printer");
 
             PrintServer printServer = (PrintServer) remoteComponent;
-            Credentials panosCredentials = new Credentials("panos", "sonap");
+            Credentials panosCredentials = new Credentials("panos", "youpi");
             Credentials jonasCredentials = new Credentials("jonas", "123345");
 
             List<Credentials> credentialsList = new ArrayList<>();
@@ -38,7 +38,7 @@ public class PrinterClient {
                     printServer.print(filename, printerName, userCredentials);
                     System.out.println("Everything Ok for " + userCredentials.getUsername());
                 } catch (AuthenticationException ae) {
-                    System.err.println("Ton mpoulo: Not authenticated. Error response was: " + ae.getMessage());
+                    System.err.println("Ton mpoulo: Not authenticated. " + ae.getMessage());
                 }
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
