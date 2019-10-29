@@ -1,13 +1,5 @@
 package gr.matamis.client;
 
-import gr.matamis.server.AuthenticationException;
-import gr.matamis.server.Credentials;
-import gr.matamis.server.PrintServer;
-
-import java.awt.*;
-import java.awt.geom.Area;
-import java.io.Serializable;
-import java.net.CacheRequest;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -15,6 +7,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+
+import gr.matamis.server.AuthenticationException;
+import gr.matamis.server.Credentials;
+import gr.matamis.server.PrintServer;
 
 public class PrinterClient {
 
@@ -40,6 +36,13 @@ public class PrinterClient {
                 } catch (AuthenticationException ae) {
                     System.err.println("Ton mpoulo: Not authenticated. " + ae.getMessage());
                 }
+            }
+
+
+            try {
+                printServer.start(panosCredentials);
+            } catch (AuthenticationException ae) {
+                System.err.println("Ton mpoulo: Not authenticated. " + ae.getMessage());
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             System.err.println("Ton mpoulo apo server: " + e.getMessage());
