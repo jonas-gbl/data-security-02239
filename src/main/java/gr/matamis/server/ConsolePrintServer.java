@@ -1,6 +1,5 @@
 package gr.matamis.server;
 
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -27,31 +26,36 @@ public class ConsolePrintServer implements PrintServer {
     @Override
     public void print(String filename, String printer, Credentials credentials) throws AuthenticationException {
 
-        if (authenticationService.isAuthenticated(credentials)) {
-            Queue<Pair<String, String>> printerQueue = printerQueues.get(printer);
-            if (printerQueue != null) {
-                String username = credentials.getUsername();
-                ImmutablePair<String, String> jobEntry = new ImmutablePair<>(username, filename);
-                printerQueue.add(jobEntry);
-            }
-        } else {
-            throw new AuthenticationException(credentials);
+        checkUserIsAuthenticated(credentials);
+
+        Queue<Pair<String, String>> printerQueue = printerQueues.get(printer);
+        if (printerQueue != null) {
+            String username = credentials.getUsername();
+            ImmutablePair<String, String> jobEntry = new ImmutablePair<>(username, filename);
+            printerQueue.add(jobEntry);
         }
-    }
-
-    @Override
-    public void queue(Credentials credentials) throws RemoteException {
 
     }
 
     @Override
-    public void restart(Credentials credentials) throws RemoteException {
+    public void queue(Credentials credentials) throws AuthenticationException {
+        checkUserIsAuthenticated(credentials);
+    }
+
+    @Override
+    public void restart(Credentials credentials) throws AuthenticationException {
+
+
+        checkUserIsAuthenticated(credentials);
+
         this.stop(credentials);
         this.start(credentials);
     }
 
     @Override
-    public void start(Credentials credentials) throws RemoteException {
+    public void start(Credentials credentials) throws AuthenticationException {
+
+        checkUserIsAuthenticated(credentials);
 
         if (this.printerFuture == null) {
 
@@ -61,23 +65,29 @@ public class ConsolePrintServer implements PrintServer {
     }
 
     @Override
-    public void stop(Credentials credentials) throws RemoteException {
+    public void stop(Credentials credentials) throws AuthenticationException {
+
+        checkUserIsAuthenticated(credentials);
+
         if (this.printerFuture != null) {
             this.printerFuture.cancel(true);
         }
     }
 
     @Override
-    public void printerStatus(Credentials credentials) throws RemoteException {
+    public void printerStatus(Credentials credentials) throws AuthenticationException {
+        checkUserIsAuthenticated(credentials);
     }
 
     @Override
-    public void readConfig(String parameter, Credentials credentials) throws RemoteException {
+    public void readConfig(String parameter, Credentials credentials) throws AuthenticationException {
+        checkUserIsAuthenticated(credentials);
 
     }
 
     @Override
-    public void setConfig(String parameter, String value, Credentials credentials) throws RemoteException {
+    public void setConfig(String parameter, String value, Credentials credentials) throws AuthenticationException {
+        checkUserIsAuthenticated(credentials);
 
     }
 
@@ -96,4 +106,9 @@ public class ConsolePrintServer implements PrintServer {
         }
     }
 
+    private void checkUserIsAuthenticated(Credentials credentials) throws AuthenticationException {
+        if (!authenticationService.isAuthenticated(credentials)) {
+            throw new AuthenticationException(credentials);
+        }
+    }
 }
